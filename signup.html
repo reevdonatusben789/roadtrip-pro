@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RoadTrip Pro - Sign Up</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home.css">
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero">
+      <h2>Sign Up</h2>
+      <p>Create your account to unlock a sleek travel planner made for effortless route management.</p>
+    </section>
+
+    <form id="signupForm">
+      <label for="signupEmail">Email</label>
+      <input type="email" id="signupEmail" placeholder="you@example.com" required>
+      <label for="signupPassword">Password</label>
+      <input type="password" id="signupPassword" placeholder="Create a strong password" required>
+      <input type="submit" class="primary" value="Sign Up">
+    </form>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    // ✅ Your actual Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFlU1UPopFF5TUbJrbpf75pUiHWUdSi1g",
+      authDomain: "road-trip-81e23.firebaseapp.com",
+      projectId: "road-trip-81e23",
+      storageBucket: "road-trip-81e23.appspot.com",
+      messagingSenderId: "197527602150",
+      appId: "1:197527602150:web:8b5fed66fb32cf4086cc27",
+      measurementId: "G-E3NGKNHJKQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    document.getElementById("signupForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("signupEmail").value;
+      const password = document.getElementById("signupPassword").value;
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(userCredential => {
+          alert("Sign‑up successful!");
+          window.location.href = "login.html"; // redirect to login
+        })
+        .catch(error => alert(error.message));
+    });
+  </script>
+</body>
+</html>

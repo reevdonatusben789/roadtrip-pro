@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RoadTrip Pro - Discover</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home.css">
+  <style>
+    .discover-shell { max-width: 1180px; }
+    .discover-topbar { margin-bottom: 42px; }
+    .discover-hero { display: flex; justify-content: space-between; gap: 28px; align-items: end; margin-bottom: 28px; }
+    .discover-hero h1 { margin: 8px 0 10px; font-family: "Playfair Display", Georgia, serif; font-size: clamp(2.1rem, 5vw, 4rem); line-height: 1.02; }
+    .discover-hero p { max-width: 560px; color: var(--muted); line-height: 1.65; margin: 0; }
+    .route-badge { min-width: 250px; padding: 18px 20px; border: 1px solid rgba(245, 158, 11, .28); border-radius: 18px; background: linear-gradient(135deg, rgba(245, 158, 11, .16), rgba(255,255,255,.04)); }
+    .route-badge small, .eyebrow { display: block; color: #f5b849; text-transform: uppercase; letter-spacing: .12em; font-size: .68rem; font-weight: 700; }
+    .route-badge strong { display: block; margin-top: 8px; font-size: 1.08rem; }
+    .route-badge span { color: var(--muted); font-size: .84rem; }
+    .discover-toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 30px; }
+    .discover-search { flex: 1; margin: 0; }
+    .discover-search input { min-height: 48px; }
+    .category-strip { display: flex; gap: 9px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 42px; scrollbar-width: thin; }
+    .category-button { flex: 0 0 auto; border: 1px solid var(--border); border-radius: 999px; background: rgba(255,255,255,.05); color: var(--text); padding: 10px 14px; cursor: pointer; font: inherit; }
+    .category-button.active, .category-button:hover { background: #f5b849; border-color: #f5b849; color: #151515; }
+    .content-section { margin-top: 42px; }
+    .section-title { display: flex; justify-content: space-between; gap: 18px; align-items: end; margin-bottom: 18px; }
+    .section-title h2 { margin: 5px 0 0; font-family: "Playfair Display", Georgia, serif; font-size: 1.8rem; }
+    .section-title p { margin: 0; color: var(--muted); font-size: .9rem; }
+    .place-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .place-card { overflow: hidden; border: 1px solid var(--border); border-radius: 18px; background: rgba(255,255,255,.055); display: flex; flex-direction: column; min-width: 0; }
+    .place-image { height: 150px; width: 100%; object-fit: cover; display: block; background: #263245; }
+    .place-body { padding: 16px; display: flex; flex: 1; flex-direction: column; }
+    .place-body h3 { margin: 5px 0 5px; font-size: 1.08rem; }
+    .place-meta, .place-distance { color: var(--muted); font-size: .82rem; }
+    .place-distance { color: #f5b849; margin-top: 8px; }
+    .place-description { color: #c4ccda; font-size: .87rem; line-height: 1.5; margin: 12px 0 16px; }
+    .place-footer { display: flex; justify-content: space-between; gap: 8px; align-items: center; margin-top: auto; }
+    .rating { color: #f5b849; font-size: .88rem; }
+    .card-actions { display: flex; gap: 7px; }
+    .card-actions button { border: 1px solid rgba(255,255,255,.16); border-radius: 9px; background: transparent; color: var(--text); padding: 8px 9px; cursor: pointer; font: inherit; font-size: .76rem; }
+    .card-actions button:last-child { background: #f5b849; border-color: #f5b849; color: #171717; font-weight: 700; }
+    .smart-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+    .smart-stop { padding: 14px 11px; border: 1px solid var(--border); border-radius: 14px; background: rgba(255,255,255,.04); color: var(--text); text-align: left; cursor: pointer; }
+    .smart-stop strong { display: block; margin-top: 7px; font-size: .84rem; }
+    .smart-stop span { color: var(--muted); font-size: .73rem; }
+    .route-map { height: 360px; border-radius: 18px; overflow: hidden; border: 1px solid var(--border); background: #182333; }
+    #discoverMap { height: 100%; width: 100%; }
+    .map-fallback { height: 100%; padding: 32px; display: grid; place-items: center; text-align: center; color: var(--muted); background: radial-gradient(circle at 20% 30%, rgba(245,184,73,.2), transparent 22%), #182333; }
+    .route-schematic { width: min(760px, 100%); padding: 20px; }
+    .route-schematic-track { display: flex; align-items: center; gap: 0; margin: 30px 0 20px; }
+    .route-schematic-line { height: 5px; flex: 1; background: linear-gradient(90deg, #f5b849, #63b3ff); }
+    .route-schematic-point { width: 16px; height: 16px; flex: 0 0 16px; border: 4px solid #f5b849; border-radius: 50%; background: #182333; }
+    .route-schematic-point.destination { border-color: #63b3ff; }
+    .route-schematic-labels { display: flex; justify-content: space-between; gap: 16px; color: var(--text); font-weight: 700; }
+    .route-schematic-stops { display: flex; justify-content: space-around; gap: 10px; margin-top: 18px; color: #f5b849; font-size: .76rem; }
+    .empty-state { padding: 54px 28px; text-align: center; border: 1px dashed rgba(245,184,73,.45); border-radius: 20px; background: rgba(255,255,255,.04); }
+    .empty-state h2 { font-family: "Playfair Display", Georgia, serif; margin: 0 0 10px; }
+    .empty-state p { max-width: 530px; margin: 0 auto 22px; color: var(--muted); line-height: 1.6; }
+    .discover-note { color: var(--muted); font-size: .84rem; margin: 16px 0 0; }
+    .no-results { grid-column: 1 / -1; padding: 24px; color: var(--muted); border: 1px dashed var(--border); border-radius: 14px; }
+    @media (max-width: 800px) { .discover-hero { display: block; } .route-badge { margin-top: 22px; } .place-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .smart-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 560px) { .discover-topbar { margin-bottom: 28px; } .discover-toolbar { display: block; } .discover-search { margin-bottom: 10px; } .place-grid { grid-template-columns: 1fr; } .smart-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .place-footer { align-items: flex-start; flex-direction: column; } }
+  </style>
+</head>
+<body>
+  <main class="page-shell discover-shell">
+    <nav class="topbar discover-topbar" aria-label="Primary navigation">
+      <a class="brand-mark" href="index.html"><img src="logo.svg" alt="Road Trip Pro" class="logo-icon"> RoadTrip Pro</a>
+      <div class="topbar-links"><a href="index.html">Plan a route</a><a href="vehicles.html">My Car</a><a href="history.html">History</a><a class="secondary nav-action" href="features.html#budget">Trip tools</a></div>
+    </nav>
+
+    <div id="routeContent" hidden>
+      <section class="discover-hero">
+        <div><span class="eyebrow">Route-aware discovery</span><h1>Discover along your route</h1><p>Find thoughtful stops, local flavors, and small detours that belong on this journey.</p></div>
+        <div class="route-badge"><small>Your planned journey</small><strong id="routeLabel"></strong><span id="routeDistance"></span></div>
+      </section>
+
+      <div class="discover-toolbar"><form class="discover-search" id="searchForm"><input id="searchInput" type="search" placeholder="Search places along your route..." aria-label="Search places along your route"></form><button class="secondary" id="clearSearch" type="button">Clear</button></div>
+      <div class="category-strip" id="categoryStrip" aria-label="Recommendation categories"></div>
+
+      <section class="content-section"><div class="section-title"><div><span class="eyebrow">Along your route</span><h2>Places worth stopping for</h2></div><p>Places worth stopping for on your journey.</p></div><div class="place-grid" id="routePlaces"></div></section>
+      <section class="content-section"><div class="section-title"><div><span class="eyebrow">Smart stops</span><h2>Useful, right when you need them</h2></div><p>Prioritized between your starting point and destination.</p></div><div class="smart-grid" id="smartStops"></div></section>
+      <section class="content-section"><div class="section-title"><div><span class="eyebrow">Destination guide</span><h2>At your destination</h2></div><p id="destinationIntro"></p></div><div class="place-grid" id="destinationPlaces"></div></section>
+      <section class="content-section"><div class="section-title"><div><span class="eyebrow">Take the scenic detour</span><h2>Hidden Gems Along the Way</h2></div><p>Take a small detour. Find something unforgettable.</p></div><div class="place-grid" id="hiddenPlaces"></div></section>
+      <section class="content-section"><div class="section-title"><div><span class="eyebrow">Route map</span><h2>Discover Around Your Route</h2></div><p>Stops are selected from this journey.</p></div><div class="route-map"><div id="discoverMap"><div class="map-fallback">Loading your route map...</div></div></div><p class="discover-note">Map markers represent recommendations from the local route catalog. Google Maps directions are used when available.</p></section>
+    </div>
+
+    <section class="empty-state" id="emptyState"><div class="eyebrow">Start with a journey</div><h2>Your next discovery starts with a route.</h2><p>Choose a starting point and destination to discover scenic spots, food, fuel stops, hidden gems and more along the way.</p><button class="primary" type="button" onclick="window.location.href='index.html'">Plan a Route</button></section>
+  </main>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBCHfhq6_Fb8pYlofdpg4aPugsen5cv7Vg&libraries=places&loading=async"></script>
+  <script>
+    const categories = ["Scenic Spots", "Waterfalls", "Photo Spots", "Food & Cafes", "Fuel Stations", "Places to Stay", "Car Services", "Camping", "Attractions", "Hidden Gems"];
+    const categoryIcons = { "Scenic Spots": "🏞️", "Waterfalls": "💦", "Photo Spots": "📸", "Food & Cafes": "🍽️", "Fuel Stations": "⛽", "Places to Stay": "🛏️", "Car Services": "🛠️", "Camping": "🏕️", "Attractions": "🏛️", "Hidden Gems": "✨" };
+    const imageFor = (query) => `https://images.unsplash.com/photo-${query}?auto=format&fit=crop&w=900&q=80`;
+    const catalog = [
+      { name: "Athirappilly Falls", category: "Waterfalls", location: "Athirappilly", description: "A powerful forest waterfall and a rewarding detour before the highlands.", rating: 4.6, distance: "18 km from route", type: "waterfall", image: imageFor("1500534623283-312aade485b7") , suitableRoutes: ["kochi-munnar"], nearbyLocations: ["athirappilly"] },
+      { name: "Valara Waterfalls", category: "Waterfalls", location: "Neriamangalam", description: "A roadside cascade framed by thick green forest on the way to Munnar.", rating: 4.5, distance: "2 km from route", type: "waterfall", image: imageFor("1433086966358-54859d0ed716"), suitableRoutes: ["kochi-munnar"], nearbyLocations: ["neriamangalam", "munnar"] },
+      { name: "Cheeyappara Waterfalls", category: "Waterfalls", location: "Adimali", description: "A beautiful roadside waterfall and popular stop on the way to Munnar.", rating: 4.5, distance: "1 km from route", type: "waterfall", image: imageFor("1546182990-dffeafbe841d"), suitableRoutes: ["kochi-munnar"], nearbyLocations: ["adimali", "munnar"] },
+      { name: "Munnar Top Station", category: "Scenic Spots", location: "Munnar", description: "Misty mountain views, tea country, and a memorable highland sunrise.", rating: 4.7, distance: "12 km ahead", type: "viewpoint", image: imageFor("1500534623283-312aade485b7"), suitableRoutes: ["kochi-munnar"], nearbyLocations: ["munnar"], destinationOnly: true },
+      { name: "Varkala Cliff Walk", category: "Scenic Spots", location: "Varkala", description: "A sea-facing cliff walk with sunset views, local shops, and cafés.", rating: 4.6, distance: "3 km before destination", type: "viewpoint", image: imageFor("1507525428034-b723cf961d3e"), suitableRoutes: ["kochi-varkala"], nearbyLocations: ["varkala"], destinationOnly: true },
+      { name: "Kappil Beach & Lake", category: "Photo Spots", location: "Kappil", description: "A quiet meeting of backwaters and sea, ideal for an unhurried photo stop.", rating: 4.5, distance: "4 km from route", type: "photo spot", image: imageFor("1507525428034-b723cf961d3e"), suitableRoutes: ["kochi-varkala"], nearbyLocations: ["kappil", "varkala"] },
+      { name: "Bekal Fort", category: "Attractions", location: "Bekal", description: "A dramatic coastal fort and one of Kerala's best sunset viewpoints.", rating: 4.7, distance: "8 km from route", type: "attraction", image: imageFor("1564507592333-c60657eea523"), suitableRoutes: ["kochi-varkala"], nearbyLocations: ["bekal"] },
+      { name: "Palolem Beach Sunset", category: "Scenic Spots", location: "Palolem, Goa", description: "A calm southern beach stop for a swim, sunset, and an easy evening.", rating: 4.7, distance: "6 km before destination", type: "beach", image: imageFor("1512343879784-a960bf40e7f2"), suitableRoutes: ["bengaluru-goa"], nearbyLocations: ["goa", "palolem"], destinationOnly: true },
+      { name: "Dudhsagar Viewpoint", category: "Photo Spots", location: "Mollem", description: "A lush Western Ghats viewpoint and an iconic Goa-bound photo stop.", rating: 4.6, distance: "5 km from route", type: "viewpoint", image: imageFor("1544735716-392fe2489ffa"), suitableRoutes: ["bengaluru-goa"], nearbyLocations: ["mollem", "goa"] },
+      { name: "Spice Plantation Trail", category: "Hidden Gems", location: "Ponda, Goa", description: "A fragrant, low-key plantation visit with local food and a slower pace.", rating: 4.4, distance: "9 km from route", type: "hidden gem", image: imageFor("1530789253388-582c481c54b0"), suitableRoutes: ["bengaluru-goa"], nearbyLocations: ["ponda", "goa"] },
+      { name: "Highway Coffee Stop", category: "Food & Cafes", location: "Between your stops", description: "A comfortable coffee break selected for the middle stretch of this journey.", rating: 4.3, distance: "500 m from route", type: "coffee", image: imageFor("1495474472287-4d71bcdd2085"), suitableRoutes: ["generic"], nearbyLocations: [] },
+      { name: "Route Fuel Point", category: "Fuel Stations", location: "On your planned corridor", description: "A practical refuel stop kept close to your planned route.", rating: 4.2, distance: "2 km from route", type: "fuel", image: imageFor("1521791055366-0d553872125f"), suitableRoutes: ["generic"], nearbyLocations: [] },
+      { name: "Roadside Rest & Stay", category: "Places to Stay", location: "Near your destination", description: "A convenient overnight option for breaking up a longer drive.", rating: 4.2, distance: "3 km from route", type: "hotel", image: imageFor("1566073771259-6a8506099945"), suitableRoutes: ["generic"], nearbyLocations: [] },
+      { name: "Travel Care Garage", category: "Car Services", location: "Along your route", description: "A practical service stop for a quick check before the final stretch.", rating: 4.1, distance: "1 km from route", type: "service", image: imageFor("1487754180451-c456f719a1fc"), suitableRoutes: ["generic"], nearbyLocations: [] },
+      { name: "Quiet Route Viewpoint", category: "Hidden Gems", location: "A small detour ahead", description: "A route-specific quiet spot surfaced for this journey, away from crowded centers.", rating: 4.4, distance: "4 km from route", type: "hidden gem", image: imageFor("1500530855697-b586d89ba3ee"), suitableRoutes: ["generic"], nearbyLocations: [] }
+    ];
+
+    let route = null;
+    let allPlaces = [];
+    let activeCategory = "All";
+    const normalize = (value) => String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const getRoute = () => { try { return JSON.parse(sessionStorage.getItem("currentTrip") || "null") || JSON.parse(localStorage.getItem("roadTripProActiveJourney") || "null"); } catch (error) { return null; } };
+    const routeKey = (start, end) => { const value = `${start}-${end}`.toLowerCase(); if (value.includes("kochi") && value.includes("munnar")) return "kochi-munnar"; if (value.includes("kochi") && value.includes("varkala")) return "kochi-varkala"; if (value.includes("bengaluru") && value.includes("goa")) return "bengaluru-goa"; return "generic"; };
+    const createGenericPlaces = (start, end) => categories.map((category, index) => ({ name: `${category} near ${end}`, category, location: `On the ${start} to ${end} route`, description: `A useful ${category.toLowerCase()} option selected for your planned journey from ${start} to ${end}.`, rating: (4.1 + (index % 5) * .1).toFixed(1), distance: index % 2 ? "2 km from route" : `${index + 1} km ahead`, type: category.toLowerCase(), image: imageFor(["1500530855697-b586d89ba3ee", "1495474472287-4d71bcdd2085", "1521791055366-0d553872125f"][index % 3]), suitableRoutes: ["generic"], nearbyLocations: [normalize(end)] }));
+    const unique = (places) => places.filter((place, index, all) => all.findIndex((entry) => entry.name === place.name) === index);
+
+    function renderCard(place) { return `<article class="place-card"><img class="place-image" src="${place.image}" alt="${place.name}" loading="lazy" onerror="this.style.display='none'"><div class="place-body"><span class="place-meta">${categoryIcons[place.category] || "📍"} ${place.category} · ${place.location}</span><h3>${place.name}</h3><span class="place-distance">📍 ${place.distance}</span><p class="place-description">${place.description}</p><div class="place-footer"><span class="rating">⭐ ${place.rating}</span><div class="card-actions"><button type="button" data-map="${place.name}, ${place.location}">Directions</button><button type="button" data-add="${place.name}">Add to Trip</button></div></div></div></article>`; }
+    function renderGrid(elementId, places) { const element = document.getElementById(elementId); element.innerHTML = places.length ? places.map(renderCard).join("") : '<div class="no-results">No route-relevant places match this selection.</div>'; }
+    function filteredPlaces() { const query = document.getElementById("searchInput").value.trim().toLowerCase(); return allPlaces.filter((place) => (activeCategory === "All" || place.category === activeCategory) && (!query || `${place.name} ${place.category} ${place.location} ${place.description}`.toLowerCase().includes(query))); }
+    function render() { const visible = filteredPlaces(); renderGrid("routePlaces", visible.filter((place) => !place.destinationOnly).slice(0, 6)); renderGrid("destinationPlaces", visible.filter((place) => place.destinationOnly).slice(0, 4)); renderGrid("hiddenPlaces", visible.filter((place) => place.category === "Hidden Gems").slice(0, 3)); }
+    function initCategories() { const strip = document.getElementById("categoryStrip"); strip.innerHTML = `<button class="category-button active" data-category="All">✦ All</button>${categories.map((category) => `<button class="category-button" data-category="${category}">${categoryIcons[category]} ${category}</button>`).join("")}`; strip.addEventListener("click", (event) => { const button = event.target.closest("button"); if (!button) return; activeCategory = button.dataset.category; strip.querySelectorAll("button").forEach((item) => item.classList.toggle("active", item === button)); render(); }); }
+    function initSmartStops() { const stops = [{ icon: "⛽", label: "Fuel", category: "Fuel Stations" }, { icon: "🍽️", label: "Food", category: "Food & Cafes" }, { icon: "☕", label: "Coffee", category: "Food & Cafes" }, { icon: "🛠️", label: "Car Service", category: "Car Services" }, { icon: "🅿️", label: "Parking", category: "Attractions" }, { icon: "🛏️", label: "Stay", category: "Places to Stay" }]; document.getElementById("smartStops").innerHTML = stops.map((stop) => `<button class="smart-stop" data-category="${stop.category}"><span>${stop.icon}</span><strong>${stop.label}</strong><span>Close to route</span></button>`).join(""); document.getElementById("smartStops").addEventListener("click", (event) => { const button = event.target.closest("button"); if (!button) return; activeCategory = button.dataset.category; document.querySelectorAll(".category-button").forEach((item) => item.classList.toggle("active", item.dataset.category === activeCategory)); render(); }); }
+    function renderRouteFallback(target, message) { const stops = allPlaces.slice(0, 4).map((place) => `<span>📍 ${place.name}</span>`).join(""); target.innerHTML = `<div class="map-fallback"><div class="route-schematic"><strong>${message}</strong><div class="route-schematic-track"><span class="route-schematic-point"></span><span class="route-schematic-line"></span><span class="route-schematic-point destination"></span></div><div class="route-schematic-labels"><span>${route.start}</span><span>${route.end}</span></div><div class="route-schematic-stops">${stops}</div></div></div>`; }
+    function initMap(attempt = 0) { const target = document.getElementById("discoverMap"); if (!route.startCoords || !route.endCoords) { renderRouteFallback(target, "Route overview"); return; } if (!window.google?.maps) { if (attempt < 20) { window.setTimeout(() => initMap(attempt + 1), 250); return; } renderRouteFallback(target, "Route overview"); return; } try { const map = new google.maps.Map(target, { zoom: 9, center: route.startCoords, mapTypeControl: false, streetViewControl: false, fullscreenControl: false }); const renderer = new google.maps.DirectionsRenderer({ map, suppressMarkers: false, polylineOptions: { strokeColor: "#f5b849", strokeWeight: 5 } }); new google.maps.DirectionsService().route({ origin: route.startCoords, destination: route.endCoords, travelMode: google.maps.TravelMode.DRIVING }, (response, status) => { if (status === "OK") renderer.setDirections(response); else renderRouteFallback(target, "Route overview"); }); allPlaces.slice(0, 10).forEach((place, index) => { const lat = route.startCoords.lat + (route.endCoords.lat - route.startCoords.lat) * ((index + 1) / (allPlaces.length + 1)); const lng = route.startCoords.lng + (route.endCoords.lng - route.startCoords.lng) * ((index + 1) / (allPlaces.length + 1)); new google.maps.Marker({ map, position: { lat, lng }, title: place.name }); }); } catch (error) { renderRouteFallback(target, "Route overview"); } }
+    function openDirections(destination) { const origin = encodeURIComponent(route?.start || "My location"); const target = encodeURIComponent(destination); window.open(`https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${target}&travelmode=driving`, "_blank", "noopener"); }
+    document.addEventListener("click", (event) => { const add = event.target.closest("[data-add]"); const mapButton = event.target.closest("[data-map]"); if (add) { add.textContent = "Added"; add.disabled = true; } if (mapButton) openDirections(mapButton.dataset.map); });
+    document.getElementById("searchForm").addEventListener("submit", (event) => event.preventDefault()); document.getElementById("searchInput").addEventListener("input", render); document.getElementById("clearSearch").addEventListener("click", () => { document.getElementById("searchInput").value = ""; render(); });
+    function hydratePlacePhotos() { if (!window.google?.maps?.places || !allPlaces.length) return; const service = new google.maps.places.PlacesService(document.createElement("div")); allPlaces.filter((place) => !place.suitableRoutes.includes("generic")).slice(0, 8).forEach((place) => { service.textSearch({ query: `${place.name}, ${place.location}` }, (results, status) => { const match = results?.[0]; if (status !== "OK" || !match?.photos?.[0]) return; place.image = match.photos[0].getUrl({ maxWidth: 900, maxHeight: 600 }); render(); }); }); }
+    function boot() { route = getRoute(); if (!route?.start || !route?.end) return; document.getElementById("emptyState").hidden = true; document.getElementById("routeContent").hidden = false; document.getElementById("routeLabel").textContent = `${route.start} → ${route.end}`; document.getElementById("routeDistance").textContent = route.distance ? `${route.distance} km · ${route.duration || "planned drive"}` : "Selected route"; const key = routeKey(route.start, route.end); const known = catalog.filter((place) => place.suitableRoutes.includes(key)); allPlaces = unique(key === "generic" ? createGenericPlaces(route.start, route.end) : [...known, ...catalog.filter((place) => place.suitableRoutes.includes("generic") && place.category !== "Hidden Gems")]); document.getElementById("destinationIntro").textContent = `Local ideas to explore after reaching ${route.end}.`; initCategories(); initSmartStops(); render(); initMap(); hydratePlacePhotos(); }
+    boot();
+  </script>
+</body>
+</html>

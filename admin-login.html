@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RoadTrip Pro - Admin Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main class="page-shell admin-shell">
+    <section class="hero">
+      <h2>Admin Login</h2>
+      <p>Enter the admin credentials to manage users, trips, fuel stations, and charging locations.</p>
+    </section>
+
+    <form id="adminLoginForm" class="admin-form">
+      <label for="adminUsername">Username</label>
+      <input type="text" id="adminUsername" placeholder="admin" required>
+
+      <label for="adminPassword">Password</label>
+      <input type="password" id="adminPassword" placeholder="••••••••" required>
+
+      <div id="adminError" class="admin-error" aria-live="polite"></div>
+
+      <input type="submit" class="primary" value="Login">
+      <button type="button" class="secondary" id="backToLanding">Back to landing page</button>
+    </form>
+  </main>
+
+  <script>
+    const ADMIN_USERNAME = 'admin';
+    const ADMIN_PASSWORD = 'admin123';
+
+    const adminLoginForm = document.getElementById('adminLoginForm');
+    const adminError = document.getElementById('adminError');
+    const backToLanding = document.getElementById('backToLanding');
+
+    adminLoginForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const username = document.getElementById('adminUsername').value.trim();
+      const password = document.getElementById('adminPassword').value;
+
+      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        try {
+          sessionStorage.setItem('roadTripProAdminLoggedIn', 'true');
+        } catch (error) {
+          console.warn('Unable to save admin login state', error);
+        }
+        window.location.href = 'admin-dashboard.html';
+        return;
+      }
+
+      adminError.textContent = 'Invalid admin username or password';
+    });
+
+    backToLanding.addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

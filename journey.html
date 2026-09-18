@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RoadTrip Pro - Journey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home.css">
+</head>
+<body>
+  <main class="page-shell journey-shell">
+    <div class="journey-toolbar">
+      <div>
+        <h1>Live Journey</h1>
+        <p id="journeySummary">Your route is loading.</p>
+      </div>
+      <a class="secondary action-link" href="index.html">← Back to Planner</a>
+    </div>
+
+    <section class="journey-layout">
+      <aside class="journey-sidebar">
+        <h2>Route Overview</h2>
+        <ul id="journeySteps" class="journey-steps"></ul>
+      </aside>
+
+      <div class="journey-map-card">
+        <div id="journeyMap"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBCHfhq6_Fb8pYlofdpg4aPugsen5cv7Vg&libraries=places&loading=async"></script>
+  <script>
+    function initJourneyPage() {
+      const mapElement = document.getElementById("journeyMap");
+      const summary = document.getElementById("journeySummary");
+      const stepsList = document.getElementById("journeySteps");
+
+      if (!mapElement || !window.google?.maps) {
+        window.setTimeout(initJourneyPage, 200);
+        return;
+      }
+
+      const savedJourney = JSON.parse(localStorage.getItem("roadTripProActiveJourney") || "null");
+      if (!savedJourney?.start || !savedJourney?.end) {
+        summary.textContent = "No active journey found. Return to the planner to start one.";
+        stepsList.innerHTML = '<li class="journey-step">Plan a route first to begin your journey.</li>';
+        return;
+      }
+
+      summary.textContent = `${savedJourney.start} → ${savedJourney.end} • ${savedJourney.distance} km • ${savedJourney.duration}`;
+
+      const map = new google.maps.Map(mapElement, {
+        zoom: 10,
+        center: { lat: 20.5937, lng: 78.9629 },
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false
+      });
+
+      const directionsService = new google.maps.DirectionsService();
+      const directionsRenderer = new google.maps.DirectionsRenderer({
+        suppressMarkers: false,
+        polylineOptions: {
+          strokeColor: "#111827",
+          strokeWeight: 5
+        }
+      });
+      directionsRenderer.setMap(map);
+
+      directionsService.route(
+        {
+          origin: savedJourney.start,
+          destination: savedJourney.end,
+          travelMode: google.maps.TravelMode.DRIVING
+        },
+        (response, status) => {
+          if (status === "OK") {
+            directionsRenderer.setDirections(response);
+            const route = response.routes[0];
+            const legs = route.legs[0];
+            const steps = legs.steps || [];
+
+            stepsList.innerHTML = "";
+            steps.forEach((step, index) => {
+              const li = document.createElement("li");
+              li.className = "journey-step";
+              li.innerHTML = `<strong>${index + 1}.</strong> ${step.instructions.replace(/<[^>]*>/g, "")}`;
+              stepsList.appendChild(li);
+            });
+          } else {
+            stepsList.innerHTML = '<li class="journey-step">Directions could not be loaded right now.</li>';
+          }
+        }
+      );
+    }
+
+    window.onload = initJourneyPage;
+  </script>
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoadTrip Pro - Trip Summary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home.css">
+  <style>
+    .trip-summary-shell {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .trip-summary-shell .topbar {
+      margin-bottom: 32px;
+    }
+
+    .summary-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+
+    .summary-card {
+      max-width: 540px;
+      width: 100%;
+      background: linear-gradient(135deg, rgba(45, 212, 191, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+      border: 1px solid rgba(71, 100, 148, 0.15);
+      border-radius: 16px;
+      padding: 40px 32px;
+      text-align: center;
+    }
+
+    .summary-success {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      animation: bounceIn 0.6s ease-out;
+    }
+
+    @keyframes bounceIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.3);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .summary-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: white;
+      margin: 16px 0 8px;
+      font-family: "Playfair Display", Georgia, serif;
+    }
+
+    .summary-subtitle {
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    .trip-details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 32px 0;
+      text-align: left;
+    }
+
+    .detail-item {
+      background: rgba(71, 100, 148, 0.08);
+      border: 1px solid rgba(71, 100, 148, 0.15);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .detail-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .detail-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: white;
+      word-break: break-word;
+    }
+
+    .detail-value.small {
+      font-size: 1rem;
+    }
+
+    .summary-route {
+      background: rgba(71, 100, 148, 0.08);
+      border: 1px solid rgba(71, 100, 148, 0.15);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+
+    .route-point {
+      flex: 1;
+    }
+
+    .route-arrow {
+      color: var(--accent);
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .summary-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    .summary-actions button {
+      flex: 1;
+      min-width: 140px;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary-action {
+      background: var(--accent);
+      color: #07111e;
+    }
+
+    .btn-primary-action:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(45, 212, 191, 0.3);
+    }
+
+    .btn-secondary-action {
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+    }
+
+    .btn-secondary-action:hover {
+      background: rgba(45, 212, 191, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .vehicle-info {
+      background: rgba(71, 100, 148, 0.08);
+      border: 1px solid rgba(71, 100, 148, 0.15);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 24px;
+      text-align: left;
+    }
+
+    .vehicle-info-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .vehicle-info-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .vehicle-info-text {
+      flex: 1;
+    }
+
+    .vehicle-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .vehicle-details {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    @media (max-width: 640px) {
+      .summary-card {
+        padding: 32px 20px;
+      }
+
+      .trip-details-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-route {
+        flex-direction: column;
+      }
+
+      .route-arrow {
+        transform: rotate(90deg);
+      }
+
+      .summary-actions {
+        flex-direction: column;
+      }
+
+      .summary-actions button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell trip-summary-shell">
+    <nav class="topbar" aria-label="Primary navigation">
+      <a class="brand-mark" href="index.html"><img src="logo.svg" alt="Road Trip Pro" class="logo-icon"> RoadTrip Pro</a>
+      <div class="topbar-links">
+        <a href="index.html">Planner</a>
+        <a href="history.html">History</a>
+        <a href="features.html#journal">Trip journal</a>
+      </div>
+    </nav>
+
+    <div class="summary-container">
+      <div class="summary-card">
+        <div class="summary-success">✓</div>
+        <h1 class="summary-title">Trip Completed</h1>
+        <p class="summary-subtitle">Your journey has been saved to your trip history.</p>
+
+        <!-- Route Summary -->
+        <div class="summary-route" id="routeSummary">
+          <div class="route-point">
+            <div class="detail-label">From</div>
+            <div class="detail-value small" id="summaryStart">--</div>
+          </div>
+          <div class="route-arrow">→</div>
+          <div class="route-point">
+            <div class="detail-label">To</div>
+            <div class="detail-value small" id="summaryEnd">--</div>
+          </div>
+        </div>
+
+        <!-- Trip Details Grid -->
+        <div class="trip-details-grid">
+          <div class="detail-item">
+            <div class="detail-label">Total Distance</div>
+            <div class="detail-value" id="summaryDistance">-- km</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Trip Duration</div>
+            <div class="detail-value" id="summaryDuration">--</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Fuel Type</div>
+            <div class="detail-value small" id="summaryFuelType">--</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Estimated Cost</div>
+            <div class="detail-value" id="summaryCost">₹--</div>
+          </div>
+        </div>
+
+        <!-- Vehicle Info -->
+        <div class="vehicle-info" id="vehicleInfo" style="display: none;">
+          <div class="vehicle-info-title">Vehicle Used</div>
+          <div class="vehicle-info-content">
+            <div class="vehicle-info-text">
+              <div class="vehicle-name" id="vehicleName">--</div>
+              <div class="vehicle-details" id="vehicleDetails">--</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Completed Date -->
+        <div class="detail-item" style="margin-top: 24px;">
+          <div class="detail-label">Completed</div>
+          <div class="detail-value small" id="summaryDate">--</div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="summary-actions">
+          <button class="btn-primary-action" onclick="window.location.href='index.html'">Plan Another Trip</button>
+          <button class="btn-secondary-action" onclick="window.location.href='history.html'">View Trip History</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFlU1UPopFF5TUbJrbpf75pUiHWUdSi1g",
+      authDomain: "road-trip-81e23.firebaseapp.com",
+      projectId: "road-trip-81e23",
+      storageBucket: "road-trip-81e23.appspot.com",
+      messagingSenderId: "197527602150",
+      appId: "1:197527602150:web:8b5fed66fb32cf4086cc27",
+      measurementId: "G-E3NGKNHJKQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    function loadTripSummary() {
+      const tripSummary = sessionStorage.getItem('tripSummary');
+      
+      if (!tripSummary) {
+        // Fallback if no summary is available
+        document.getElementById('summaryStart').textContent = 'Unknown';
+        document.getElementById('summaryEnd').textContent = 'Unknown';
+        document.getElementById('summaryDistance').textContent = '-- km';
+        document.getElementById('summaryDuration').textContent = '--';
+        document.getElementById('summaryFuelType').textContent = '--';
+        document.getElementById('summaryCost').textContent = '₹--';
+        document.getElementById('summaryDate').textContent = 'N/A';
+        return;
+      }
+
+      const data = JSON.parse(tripSummary);
+
+      // Populate trip details
+      document.getElementById('summaryStart').textContent = data.start || 'Unknown';
+      document.getElementById('summaryEnd').textContent = data.end || 'Unknown';
+      document.getElementById('summaryDistance').textContent = `${data.distance || '--'} km`;
+      document.getElementById('summaryDuration').textContent = data.duration || '--';
+      document.getElementById('summaryFuelType').textContent = (data.fuelType || '--').toUpperCase();
+      document.getElementById('summaryCost').textContent = `₹${data.fuelCost || '--'}`;
+      document.getElementById('summaryDate').textContent = new Date(data.completedAt || data.date).toLocaleString();
+
+      // Load vehicle info
+      loadVehicleInfo();
+    }
+
+    function loadVehicleInfo() {
+      const vehicles = JSON.parse(localStorage.getItem('roadTripProVehicles') || '[]');
+      
+      if (vehicles.length > 0) {
+        const vehicle = vehicles[0];
+        const vehicleInfo = document.getElementById('vehicleInfo');
+        vehicleInfo.style.display = 'block';
+        
+        document.getElementById('vehicleName').textContent = 
+          `${vehicle.brand} ${vehicle.model}${vehicle.variant ? ' ' + vehicle.variant : ''}`;
+        
+        let details = `${vehicle.year} • ${vehicle.transmission}`;
+        if (vehicle.fuelType === 'ev') {
+          details += ` • ${vehicle.batteryCapacity}kWh`;
+        } else {
+          details += ` • ${vehicle.mileage}km/l`;
+        }
+        document.getElementById('vehicleDetails').textContent = details;
+      }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = 'login.html?redirect=trip-summary.html';
+        return;
+      }
+      loadTripSummary();
+    });
+  </script>
+</body>
+</html>

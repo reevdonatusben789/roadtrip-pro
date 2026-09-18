@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoadTrip Pro - Trip Tools</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home.css">
+</head>
+<body>
+  <main class="page-shell feature-shell">
+    <nav class="topbar" aria-label="Primary navigation">
+      <a class="brand-mark" href="index.html"><img src="logo.svg" alt="Road Trip Pro" class="logo-icon"> RoadTrip Pro</a>
+      <div class="topbar-links feature-nav">
+        <a href="discover.html">Explore</a>
+        <a href="vehicles.html">My Car</a>
+        <a href="history.html">History</a>
+        <a class="secondary nav-action" href="index.html">Planner</a>
+      </div>
+    </nav>
+
+    <header class="feature-hero">
+      <div>
+        <p class="eyebrow">Trip tools</p>
+        <h1>Make the journey<br><em>feel effortless.</em></h1>
+        <p>Keep the practical details close, from the first fuel estimate to the stories you bring home.</p>
+      </div>
+      <div class="feature-hero-stat"><strong id="savedToolCount">0</strong><span>saved trip tools</span></div>
+    </header>
+
+    <nav class="feature-tabs" aria-label="Trip tools">
+      <a href="#budget">Budget</a><a href="#group">Group Trip</a><a href="#journal">Journal</a><a class="emergency-tab" href="#emergency">Emergency</a>
+    </nav>
+
+    <section class="feature-section" id="budget">
+      <div class="feature-section-heading"><div><p class="eyebrow">01 / Trip budget</p><h2>Know what the road costs.</h2><p>Start with the route estimate, then make the rest of the plan real.</p></div><span class="feature-icon">₹</span></div>
+      <div class="feature-grid budget-layout">
+        <form class="feature-card expense-form" id="budgetForm">
+          <div class="form-section-title"><strong>Expense breakdown</strong><span id="budgetRouteNote">No route loaded</span></div>
+          <div class="expense-grid" id="expenseFields"></div>
+          <div class="field-group"><label for="travelerCount">Travelers</label><input id="travelerCount" type="number" min="1" value="1" required></div>
+          <button class="primary" type="submit">Save budget <b>→</b></button>
+        </form>
+        <div class="feature-card budget-total-card"><p class="eyebrow">Estimated total</p><strong id="budgetTotal">₹0.00</strong><p id="budgetPerPerson">₹0.00 per person</p><div class="budget-bars" id="budgetBars"></div></div>
+      </div>
+    </section>
+
+    <section class="feature-section" id="group">
+      <div class="feature-section-heading"><div><p class="eyebrow">02 / Group trip</p><h2>Everyone knows their share.</h2><p>Plan together, split clearly, and keep the group moving.</p></div><span class="feature-icon">◎</span></div>
+      <div class="feature-grid group-layout">
+        <form class="feature-card" id="groupForm">
+          <div class="form-section-title"><strong>Trip details</strong><span>Saved on this device</span></div>
+          <div class="field-group"><label for="groupName">Trip name</label><input id="groupName" placeholder="Munnar Weekend Drive" required></div>
+          <div class="field-row"><div class="field-group"><label for="groupStart">Starting location</label><input id="groupStart" placeholder="Kochi"></div><div class="field-group"><label for="groupDestination">Destination</label><input id="groupDestination" placeholder="Munnar"></div></div>
+          <div class="field-group"><label for="groupDate">Travel date</label><input id="groupDate" type="date"></div>
+          <div class="form-section-title participant-title"><strong>Participants</strong><button class="secondary compact-action" id="addParticipant" type="button">+ Add participant</button></div>
+          <div id="participantFields" class="stacked-fields"></div>
+          <button class="primary" type="submit">Save group trip <b>→</b></button>
+        </form>
+        <div class="feature-card group-summary"><div class="form-section-title"><strong id="groupSummaryName">Your group trip</strong><span id="groupSummaryRoute">Add trip details</span></div><div class="group-total"><span>Total group expenses</span><strong id="groupTotal">₹0.00</strong></div><div id="groupShares" class="share-list"></div><div class="group-actions"><button class="secondary" id="addGroupExpense" type="button">+ Add expense</button><button class="secondary" id="shareGroup" type="button">Share trip</button></div></div>
+      </div>
+    </section>
+
+    <section class="feature-section" id="journal">
+      <div class="feature-section-heading"><div><p class="eyebrow">03 / Trip journal</p><h2>Keep the best parts.</h2><p>Save the places, photos, and small details you do not want to lose.</p></div><span class="feature-icon">✎</span></div>
+      <div class="feature-grid journal-layout">
+        <form class="feature-card" id="journalForm"><div class="form-section-title"><strong id="journalFormTitle">New journal entry</strong><span>Private on this device</span></div><input id="journalId" type="hidden"><div class="field-group"><label for="journalTitle">Trip title</label><input id="journalTitle" placeholder="My Munnar Trip" required></div><div class="field-row"><div class="field-group"><label for="journalStart">Starting location</label><input id="journalStart" placeholder="Kochi"></div><div class="field-group"><label for="journalDestination">Destination</label><input id="journalDestination" placeholder="Munnar" required></div></div><div class="field-row"><div class="field-group"><label for="journalDate">Date</label><input id="journalDate" type="date"></div><div class="field-group"><label for="journalDistance">Distance (km)</label><input id="journalDistance" type="number" min="0" step="0.1"></div></div><div class="field-group"><label for="journalDuration">Duration</label><input id="journalDuration" placeholder="2 hr 40 min"></div><div class="field-group"><label for="journalPlaces">Places visited <span>(comma separated)</span></label><input id="journalPlaces" placeholder="Tea gardens, View point"></div><div class="field-group"><label for="journalNotes">Personal notes</label><textarea id="journalNotes" rows="4" placeholder="An amazing mountain drive with friends..."></textarea></div><div class="field-group"><label for="journalPhotos">Trip photos</label><input id="journalPhotos" type="file" accept="image/*" multiple></div><div id="journalPhotoPreview" class="photo-preview"></div><button class="primary" type="submit">Save journal entry <b>→</b></button><button class="secondary" id="cancelJournalEdit" type="button" hidden>Cancel edit</button></form>
+        <div class="journal-feed" id="journalFeed"></div>
+      </div>
+    </section>
+
+    <section class="feature-section emergency-section" id="emergency">
+      <div class="feature-section-heading"><div><p class="eyebrow">04 / Emergency</p><h2>Help, when you need it.</h2><p id="emergencyLocationNote">Search near your current trip or choose a location below.</p></div><span class="feature-icon emergency-icon">!</span></div>
+      <div class="emergency-toolbar"><input id="emergencyLocation" placeholder="Current trip location or city"><button class="primary" id="useEmergencyLocation" type="button">Use my location</button></div>
+      <div class="emergency-grid" id="emergencyGrid"></div>
+      <div class="feature-card contacts-card"><div class="form-section-title"><strong>Emergency contacts</strong><button class="secondary compact-action" id="addContact" type="button">+ Add emergency contact</button></div><div id="contactList" class="contact-list"></div><form id="contactForm" class="contact-form" hidden><div class="field-row"><input id="contactName" placeholder="Contact name" required><input id="contactRelationship" placeholder="Relationship" required><input id="contactPhone" type="tel" placeholder="Phone number" required></div><button class="primary compact-action" type="submit">Save contact</button></form></div>
+    </section>
+  </main>
+  <script type="module" src="features.js"></script>
+</body>
+</html>

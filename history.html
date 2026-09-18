@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RoadTrip Pro - Trip History</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home.css">
+</head>
+<body>
+  <main class="page-shell">
+    <div class="history-toolbar">
+      <div>
+        <h1>Trip History</h1>
+        <p class="history-status" id="historyStatus">Loading your saved trips...</p>
+      </div>
+      <a class="secondary action-link" href="index.html">← Back to Planner</a>
+    </div>
+
+    <div id="historyFeed" class="history-grid"></div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFlU1UPopFF5TUbJrbpf75pUiHWUdSi1g",
+      authDomain: "road-trip-81e23.firebaseapp.com",
+      projectId: "road-trip-81e23",
+      storageBucket: "road-trip-81e23.appspot.com",
+      messagingSenderId: "197527602150",
+      appId: "1:197527602150:web:8b5fed66fb32cf4086cc27",
+      measurementId: "G-E3NGKNHJKQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    async function renderHistory(user) {
+      const historyFeed = document.getElementById("historyFeed");
+      const historyStatus = document.getElementById("historyStatus");
+      if (!historyFeed || !user) return;
+
+      try {
+        const q = query(collection(db, "trips"), where("uid", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          if (historyStatus) historyStatus.textContent = "No saved trips yet.";
+          historyFeed.innerHTML = '<div class="trip-history-card"><h3>No trip history yet</h3><p class="history-status">Plan a route from the main page to see it appear here.</p></div>';
+          return;
+        }
+
+        const trips = querySnapshot.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        if (historyStatus) historyStatus.textContent = `${trips.length} saved trip${trips.length === 1 ? "" : "s"}`;
+        historyFeed.innerHTML = "";
+        trips.forEach((trip) => {
+          const card = document.createElement("div");
+          card.className = "trip-history-card";
+          card.innerHTML = `
+            <h3>${trip.start} → ${trip.end}</h3>
+            <div class="trip-history-details">
+              <p><strong>Date:</strong> ${trip.date}</p>
+              <p><strong>Distance:</strong> ${trip.distance} km</p>
+              <p><strong>Duration:</strong> ${trip.duration}</p>
+              <p><strong>Fuel Type:</strong> ${trip.fuelType || "Petrol"}</p>
+              <p><strong>Fuel Price:</strong> ₹${trip.fuelPrice || "-"}</p>
+              <p><strong>Estimated Cost:</strong> ₹${trip.fuelCost}</p>
+            </div>
+          `;
+          historyFeed.appendChild(card);
+        });
+      } catch (error) {
+        console.error("Could not load trip history:", error);
+        if (historyStatus) historyStatus.textContent = "Trip history could not be loaded.";
+        historyFeed.innerHTML = '<div class="trip-history-card"><h3>Unable to load trips</h3><p class="history-status">Check your connection or Firestore permissions, then refresh this page.</p></div>';
+      }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+      renderHistory(user);
+    });
+  </script>
+</body>
+</html>

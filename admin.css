@@ -1,0 +1,92 @@
+:root {
+  --admin-bg: rgba(12, 19, 36, 0.98);
+  --admin-panel: rgba(18, 28, 50, 0.95);
+  --admin-border: rgba(255, 255, 255, 0.14);
+  --admin-soft: rgba(99, 179, 255, 0.12);
+}
+
+.admin-shell {
+  max-width: 940px;
+  padding: 40px 42px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.admin-header h1 {
+  margin: 0 0 8px;
+  font-size: clamp(2rem, 2.3vw, 2.4rem);
+}
+
+.admin-header p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 600px;
+}
+
+.admin-form {
+  display: grid;
+  gap: 16px;
+  max-width: 420px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 24px;
+  padding: 28px;
+}
+
+.admin-form label,
+.admin-form input {
+  width: 100%;
+}
+
+.admin-error {
+  min-height: 24px;
+  color: #fca5a5;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.admin-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px;
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-border);
+  border-radius: 22px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.admin-card h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.admin-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.admin-statistics {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 760px) {
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+}

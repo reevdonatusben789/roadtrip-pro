@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RoadTrip Pro - Login</title>
+  <link rel="stylesheet" href="home.css">
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero">
+      <h2>Login</h2>
+      <p>Access your premium trip plans and keep every journey on track with secure account access.</p>
+    </section>
+
+    <form id="loginForm">
+      <label for="loginEmail">Email</label>
+      <input type="email" id="loginEmail" placeholder="you@example.com" required>
+      <label for="loginPassword">Password</label>
+      <input type="password" id="loginPassword" placeholder="Enter your password" required>
+      <input type="submit" class="primary" value="Login">
+
+      <p style="margin-top: 12px;">
+        <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+      </p>
+
+      <div class="button-row" style="margin-top: 12px;">
+        <button type="button" class="secondary" onclick="window.location.href='signup.html'">Sign Up</button>
+      </div>
+    </form>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFlU1UPopFF5TUbJrbpf75pUiHWUdSi1g",
+      authDomain: "road-trip-81e23.firebaseapp.com",
+      projectId: "road-trip-81e23",
+      storageBucket: "road-trip-81e23.appspot.com",
+      messagingSenderId: "197527602150",
+      appId: "1:197527602150:web:8b5fed66fb32cf4086cc27",
+      measurementId: "G-E3NGKNHJKQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // ✅ Login handler
+    document.getElementById("loginForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("Login successful!");
+          window.location.href = "index.html";
+        })
+        .catch(error => alert(error.message));
+    });
+
+    // ✅ Forgot password handler
+    document.getElementById("forgotPasswordLink").addEventListener("click", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value;
+
+      if (!email) {
+        alert("Please enter your email address first.");
+        return;
+      }
+
+      sendPasswordResetEmail(auth, email)
+        .then(() => {
+          alert("Password reset email sent! Check your inbox.");
+        })
+        .catch(error => alert(error.message));
+    });
+  </script>
+</body>
+</html>

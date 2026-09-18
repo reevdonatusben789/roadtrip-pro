@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RoadTrip Pro - Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main class="page-shell admin-shell">
+    <section class="admin-header">
+      <div>
+        <h1>Admin Dashboard</h1>
+        <p>Manage the RoadTrip Pro platform from one central admin panel.</p>
+      </div>
+      <button class="secondary" id="adminLogout">Logout</button>
+    </section>
+
+    <section class="admin-grid">
+      <article class="admin-card">
+        <h2>Dashboard</h2>
+        <p>Quick overview of the admin workspace and recent activity.</p>
+      </article>
+      <article class="admin-card">
+        <h2>Manage Users</h2>
+        <p>View user accounts, check sign-up status, and audit user activity.</p>
+      </article>
+      <article class="admin-card">
+        <h2>Manage Trips</h2>
+        <p>Review planned trips and make adjustments for featured routes.</p>
+      </article>
+      <article class="admin-card">
+        <h2>Manage Fuel Stations</h2>
+        <p>Keep petrol and diesel station information accurate across the app.</p>
+      </article>
+      <article class="admin-card">
+        <h2>Manage EV Charging Stations</h2>
+        <p>Update charge point listings and verify EV route coverage.</p>
+      </article>
+      <article class="admin-card admin-statistics">
+        <h2>Trip Statistics</h2>
+        <p>Monitor trip volume, distance totals, and fuel savings.</p>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const adminLogout = document.getElementById('adminLogout');
+
+    function ensureAdminLoggedIn() {
+      const isLoggedIn = sessionStorage.getItem('roadTripProAdminLoggedIn') === 'true';
+      if (!isLoggedIn) {
+        window.location.href = 'index.html';
+      }
+    }
+
+    adminLogout.addEventListener('click', () => {
+      try {
+        sessionStorage.removeItem('roadTripProAdminLoggedIn');
+      } catch (error) {
+        console.warn('Unable to clear admin session state', error);
+      }
+      window.location.href = 'index.html';
+    });
+
+    ensureAdminLoggedIn();
+  </script>
+</body>
+</html>

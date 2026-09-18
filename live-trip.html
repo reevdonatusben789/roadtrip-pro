@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoadTrip Pro - Live Navigation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home.css">
+  <style>
+    .live-trip-shell {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      gap: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    .live-trip-shell .topbar {
+      margin-bottom: 0;
+      padding: 12px 24px;
+      background: #07111e;
+      border-bottom: 1px solid rgba(71, 100, 148, 0.15);
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    .live-trip-topbar-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .live-trip-container {
+      display: flex;
+      flex: 1;
+      gap: 0;
+      overflow: hidden;
+    }
+
+    #liveMap {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+    }
+
+    .trip-info-panel {
+      width: 380px;
+      background: linear-gradient(135deg, #0a1628 0%, #0f1e35 100%);
+      border-left: 1px solid rgba(71, 100, 148, 0.15);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      gap: 20px;
+      box-shadow: -4px 0 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .trip-info-section {
+      background: rgba(71, 100, 148, 0.08);
+      border: 1px solid rgba(71, 100, 148, 0.15);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .trip-info-header {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .trip-info-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      margin: 4px 0;
+      word-break: break-word;
+    }
+
+    .trip-info-detail {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin: 8px 0;
+    }
+
+    .trip-status {
+      background: rgba(45, 212, 191, 0.1);
+      border: 1px solid rgba(45, 212, 191, 0.3);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .trip-status.paused {
+      background: rgba(251, 146, 60, 0.1);
+      border-color: rgba(251, 146, 60, 0.3);
+    }
+
+    .trip-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2dd4bf;
+      animation: pulse 2s infinite;
+    }
+
+    .trip-status.paused .trip-status-dot {
+      background: #fb923c;
+      animation: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .trip-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    .trip-controls button {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 100px;
+    }
+
+    .btn-pause-resume {
+      background: rgba(45, 212, 191, 0.15);
+      color: #2dd4bf;
+      border: 1px solid rgba(45, 212, 191, 0.3);
+    }
+
+    .btn-pause-resume:hover {
+      background: rgba(45, 212, 191, 0.25);
+    }
+
+    .btn-end-trip {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-end-trip:hover {
+      background: rgba(239, 68, 68, 0.25);
+    }
+
+    .btn-recenter {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: white;
+      border: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      z-index: 50;
+      transition: all 0.2s ease;
+    }
+
+    .btn-recenter:hover {
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      transform: scale(1.1);
+    }
+
+    .location-error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      margin-bottom: 12px;
+    }
+
+    .fuel-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .fuel-item {
+      background: rgba(45, 212, 191, 0.05);
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(45, 212, 191, 0.1);
+    }
+
+    .fuel-item-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .fuel-item-value {
+      font-size: 1rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .off-route-warning {
+      background: rgba(251, 146, 60, 0.15);
+      border: 1px solid rgba(251, 146, 60, 0.3);
+      color: #fed7aa;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      display: none;
+    }
+
+    .off-route-warning.show {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .live-trip-container {
+        flex-direction: column;
+      }
+
+      .trip-info-panel {
+        width: 100%;
+        max-height: 40%;
+        border-left: none;
+        border-top: 1px solid rgba(71, 100, 148, 0.15);
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      #liveMap {
+        min-height: 60%;
+      }
+
+      .btn-recenter {
+        bottom: 200px;
+      }
+    }
+
+    .loading-map {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      background: #07111e;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell live-trip-shell">
+    <nav class="topbar" aria-label="Primary navigation">
+      <a class="brand-mark" href="index.html"><img src="logo.svg" alt="Road Trip Pro" class="logo-icon"> RoadTrip Pro</a>
+      <div class="live-trip-topbar-actions">
+        <div class="live-trip-topbar-title">Live Navigation</div>
+        <a class="secondary nav-action emergency-nav-action" href="features.html#emergency">Emergency</a>
+      </div>
+    </nav>
+
+    <div class="live-trip-container">
+      <div id="liveMap" class="loading-map">
+        <span>Loading map...</span>
+      </div>
+
+      <div class="trip-info-panel">
+        <div id="locationError" class="location-error" style="display: none;"></div>
+        <div id="offRouteWarning" class="off-route-warning"></div>
+
+        <div class="trip-status" id="tripStatus">
+          <span class="trip-status-dot"></span>
+          <span id="tripStatusText">Trip in progress</span>
+        </div>
+
+        <!-- Destination Info -->
+        <div class="trip-info-section">
+          <div class="trip-info-header">Destination</div>
+          <div class="trip-info-value" id="destinationName">--</div>
+          <div class="trip-info-detail" id="destinationAddress">--</div>
+        </div>
+
+        <!-- Distance & Time Info -->
+        <div class="trip-info-section">
+          <div class="fuel-grid">
+            <div class="fuel-item">
+              <div class="fuel-item-label">Distance</div>
+              <div class="fuel-item-value" id="distanceRemaining">-- km</div>
+            </div>
+            <div class="fuel-item">
+              <div class="fuel-item-label">Time Left</div>
+              <div class="fuel-item-value" id="timeRemaining">--</div>
+            </div>
+            <div class="fuel-item">
+              <div class="fuel-item-label">ETA</div>
+              <div class="fuel-item-value" id="eta">--</div>
+            </div>
+            <div class="fuel-item">
+              <div class="fuel-item-label">Speed</div>
+              <div class="fuel-item-value" id="currentSpeed">-- km/h</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fuel/Battery Info -->
+        <div class="trip-info-section" id="fuelSection">
+          <div class="trip-info-header" id="fuelHeader">Fuel Information</div>
+          <div id="fuelDetails"></div>
+        </div>
+
+        <!-- Trip Controls -->
+        <div class="trip-controls">
+          <button class="btn-pause-resume" id="pauseResumeBtn" onclick="toggleTripPause()">Pause Trip</button>
+          <button class="btn-end-trip" id="endTripBtn" onclick="endTrip()">End Trip</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <button class="btn-recenter" onclick="recenterMap()" title="Re-center map on current location">📍</button>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBCHfhq6_Fb8pYlofdpg4aPugsen5cv7Vg&libraries=places,geometry"></script>
+  <script type="module" src="live-trip.js"></script>
+</body>
+</html>

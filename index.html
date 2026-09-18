@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RoadTrip Pro - Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home.css">
+</head>
+<body>
+  <main class="page-shell planner-shell">
+    <nav class="topbar" aria-label="Primary navigation">
+      <a class="brand-mark" href="index.html"><img src="images/logo.png" alt="Road Trip Pro" class="logo-icon"> RoadTrip Pro</a>
+      <div class="topbar-links">
+        <a href="discover.html">Explore</a>
+        <a href="vehicles.html">My Car</a>
+        <a href="history.html">History</a>
+        <details class="feature-menu">
+          <summary>More</summary>
+          <div class="feature-menu-panel">
+            <a href="features.html#budget">Trip Budget</a>
+            <a href="features.html#group">Group Trip</a>
+            <a href="features.html#journal">Trip Journal</a>
+            <a href="features.html#emergency">Emergency</a>
+          </div>
+        </details>
+        <div class="user-section" id="userSection" style="display: none;">
+          <span class="user-name" id="userName"></span>
+          
+          <button class="secondary nav-action" id="logoutBtn">Logout</button>
+        </div>
+        <a class="secondary nav-action" id="loginLink" href="login.html">Login</a>
+      </div>
+    </nav>
+
+    <section class="planner-hero">
+      <div>
+        <span class="section-chip">Your road starts here</span>
+        <h1>Plan the route.<br><em>Keep the moment.</em></h1>
+        <p>Build a clear route, compare the journey, and see the details before you turn the key.</p>
+      </div>
+      <div class="hero-route-mark" aria-hidden="true"><span>✦</span><i></i><span>●</span></div>
+    </section>
+
+    <section class="planner-card">
+      <div class="planner-form-wrap">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Route builder</p>
+            <h2>Where are you going?</h2>
+          </div>
+          <span class="step-count">01 / 01</span>
+        </div>
+
+        <form id="tripForm">
+          <div class="field-row">
+            <div class="field-group">
+              <label for="start">Starting point</label>
+              <input type="text" id="start" placeholder="Search city, address, or landmark" autocomplete="off" required>
+              <div id="startingPointStatus" style="margin-top: 8px;"></div>
+              <button type="button" id="useCurrentLocation" class="use-current-location-btn" title="Use your current location as starting point">
+                📍 Use my current location
+              </button>
+            </div>
+            <div class="field-group">
+              <label for="end">Destination</label>
+              <input type="text" id="end" placeholder="Search destination" autocomplete="off" required>
+            </div>
+          </div>
+
+          <div class="field-row trip-settings">
+            <div class="field-group mileage-field" id="mileageField">
+              <label for="mileage">Mileage <span>(km/l)</span></label>
+              <input type="number" id="mileage" placeholder="15" min="1" step="0.1" required>
+            </div>
+            <div class="field-group">
+              <label for="fuelType">Fuel type</label>
+              <select id="fuelType">
+                <option value="petrol">Petrol</option>
+                <option value="diesel">Diesel</option>
+                <option value="ev">EV</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group fuel-price-field" id="fuelPriceField">
+            <label for="fuelPrice">Current fuel price <span>(₹ / litre)</span></label>
+            <input type="number" id="fuelPrice" min="1" step="0.01" readonly>
+          </div>
+
+          <div class="ev-details" id="evDetails" hidden>
+            <div class="ev-details-heading"><strong>EV route details</strong><span>Approximate estimate</span></div>
+            <p id="evStatus">Select EV and plan your route to find charging stations.</p>
+            <div class="ev-summary" id="evSummary"></div>
+          </div>
+
+          <div class="popular-destinations">
+            <span class="field-caption">Popular destinations</span>
+            <div class="destination-pills">
+              <button type="button" class="destination-pill" data-destination="Munnar, Kerala">Munnar</button>
+              <button type="button" class="destination-pill" data-destination="Ooty, Tamil Nadu">Ooty</button>
+              <button type="button" class="destination-pill" data-destination="Goa, India">Goa</button>
+              <button type="button" class="destination-pill" data-destination="Coorg, Karnataka">Coorg</button>
+            </div>
+          </div>
+
+          <button type="submit" class="primary planner-submit"><span>Plan my trip</span><b>→</b></button>
+        </form>
+
+        <div id="result" class="result-panel"></div>
+      </div>
+
+      <div class="map-card">
+        <div class="map-card-header">
+          <div><p class="eyebrow">Live preview</p><h2>Your route</h2></div>
+          <span class="map-status"><i></i> Ready</span>
+        </div>
+        <div id="map"></div>
+        <div class="map-caption"><span>India route map</span><span>Google Maps</span></div>
+      </div>
+    </section>
+
+    <section class="recommendation-section route-recommendations" id="routeRecommendations" hidden>
+      <div class="recommendation-header">
+        <div class="recommendation-title">
+          <p class="eyebrow">Along your route</p>
+          <h2>Places worth the stop</h2>
+          <p id="recommendationStatus">Searching near your destination...</p>
+        </div>
+        <span class="map-status"><i></i> Google Places</span>
+      </div>
+      <div class="recommendation-grid" id="recommendationGrid"></div>
+    </section>
+
+    <footer class="site-footer" id="site-footer">
+      <div class="site-footer-row site-footer-row-primary">
+        <div class="site-footer-brand">
+          <a class="site-footer-logo" href="index.html">
+            <img src="images/logo.png" alt="RoadTrip Pro logo">
+            <span>RoadTrip Pro</span>
+          </a>
+          <span class="site-footer-tagline">Plan the route. Keep the moment.</span>
+        </div>
+
+        <div class="site-footer-column">
+          <h2>Quick Links</h2>
+          <div class="site-footer-links">
+            <a href="index.html">Home</a>
+            <a href="discover.html">Explore</a>
+            <a href="vehicles.html">My Car</a>
+            <a href="history.html">History</a>
+            <a href="index.html#tripForm">Trip Planner</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="site-footer-row site-footer-row-secondary">
+        <div class="site-footer-column">
+          <h2>Features</h2>
+          <div class="site-footer-links">
+            <a href="features.html#budget">Trip Budget</a>
+            <a href="features.html#group">Group Trips</a>
+            <a href="features.html#journal">Trip Journal</a>
+            <a href="features.html#emergency">Emergency</a>
+            <a href="#routeRecommendations">Route Recommendations</a>
+          </div>
+        </div>
+
+        <div class="site-footer-column">
+          <h2>Support</h2>
+          <div class="site-footer-links">
+            <a href="mailto:roadtrippro.support@example.com?subject=FAQ">FAQs</a>
+            <a href="mailto:roadtrippro.support@example.com">Contact Us</a>
+            <a href="mailto:roadtrippro.support@example.com?subject=Report%20an%20Issue">Report an Issue</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="site-footer-bottom">
+        <span>© 2026 RoadTrip Pro. All rights reserved.</span>
+        <div class="site-footer-legal">
+          <a href="#site-footer">Privacy Policy</a>
+          <a href="#site-footer">Terms &amp; Conditions</a>
+          <span>Made for road-trip enthusiasts</span>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBCHfhq6_Fb8pYlofdpg4aPugsen5cv7Vg&libraries=places"></script>
+  <script type="module" src="script.js"></script>
+  <script src="custom-select.js"></script>
+  <script>
+    document.querySelectorAll(".destination-pill").forEach((pill) => {
+      pill.addEventListener("click", () => {
+        document.getElementById("end").value = pill.dataset.destination;
+        document.getElementById("end").focus();
+      });
+    });
+  </script>
+</body>
+</html>
