@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RoadTrip Pro - Admin Login</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,51 +14,92 @@
   <main class="page-shell admin-shell">
     <section class="hero">
       <h2>Admin Login</h2>
-      <p>Enter the admin credentials to manage users, trips, fuel stations, and charging locations.</p>
+      <p>Use an admin account to manage users, trips, pricing, and platform settings.</p>
     </section>
 
     <form id="adminLoginForm" class="admin-form">
-      <label for="adminUsername">Username</label>
-      <input type="text" id="adminUsername" placeholder="admin" required>
+      <label for="adminEmail">Email</label>
+      <input type="email" id="adminEmail" placeholder="admin@roadtrippro.com" required>
 
       <label for="adminPassword">Password</label>
       <input type="password" id="adminPassword" placeholder="••••••••" required>
 
       <div id="adminError" class="admin-error" aria-live="polite"></div>
 
-      <input type="submit" class="primary" value="Login">
-      <button type="button" class="secondary" id="backToLanding">Back to landing page</button>
+      <button type="submit" class="primary">Login</button>
+      <button type="button" class="secondary" id="backToLanding">Back to User Login</button>
     </form>
   </main>
 
-  <script>
-    const ADMIN_USERNAME = 'admin';
-    const ADMIN_PASSWORD = 'admin123';
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const adminLoginForm = document.getElementById('adminLoginForm');
-    const adminError = document.getElementById('adminError');
-    const backToLanding = document.getElementById('backToLanding');
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFlU1UPopFF5TUbJrbpf75pUiHWUdSi1g",
+      authDomain: "road-trip-81e23.firebaseapp.com",
+      projectId: "road-trip-81e23",
+      storageBucket: "road-trip-81e23.appspot.com",
+      messagingSenderId: "197527602150",
+      appId: "1:197527602150:web:8b5fed66fb32cf4086cc27",
+      measurementId: "G-E3NGKNHJKQ"
+    };
 
-    adminLoginForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const username = document.getElementById('adminUsername').value.trim();
-      const password = document.getElementById('adminPassword').value;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-        try {
-          sessionStorage.setItem('roadTripProAdminLoggedIn', 'true');
-        } catch (error) {
-          console.warn('Unable to save admin login state', error);
-        }
-        window.location.href = 'admin-dashboard.html';
-        return;
+    const adminLoginForm = document.getElementById("adminLoginForm");
+    const adminError = document.getElementById("adminError");
+    const backToLanding = document.getElementById("backToLanding");
+
+    async function approveAdminAccess(user) {
+      const token = await user.getIdTokenResult();
+      if (token.claims && token.claims.role === "admin") {
+        return true;
       }
 
-      adminError.textContent = 'Invalid admin username or password';
+      const ref = doc(db, "users", user.uid);
+      const snapshot = await getDoc(ref);
+      return snapshot.exists() && (snapshot.data().role === "admin");
+    }
+
+    adminLoginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const email = document.getElementById("adminEmail").value.trim();
+      const password = document.getElementById("adminPassword").value;
+
+      adminError.textContent = "";
+
+      try {
+        const result = await signInWithEmailAndPassword(auth, email, password);
+        const isAdmin = await approveAdminAccess(result.user);
+
+        if (!isAdmin) {
+          await signOut(auth);
+          sessionStorage.removeItem("roadTripProAdminLoggedIn");
+          adminError.textContent = "Access denied. Only admin users can access this dashboard.";
+          return;
+        }
+
+        sessionStorage.setItem("roadTripProAdminLoggedIn", "true");
+        window.location.href = "admin-dashboard.html";
+      } catch (error) {
+        adminError.textContent = error.message || "Login failed.";
+      }
     });
 
-    backToLanding.addEventListener('click', () => {
-      window.location.href = 'index.html';
+    backToLanding.addEventListener("click", () => {
+      window.location.href = "login.html";
     });
   </script>
 </body>

@@ -21,6 +21,10 @@
       <label for="signupPassword">Password</label>
       <input type="password" id="signupPassword" placeholder="Create a strong password" required>
       <input type="submit" class="primary" value="Sign Up">
+
+      <div class="button-row" style="margin-top: 12px;">
+        <button type="button" class="secondary" onclick="window.location.href='admin-login.html'">Admin Login</button>
+      </div>
     </form>
   </main>
 
@@ -28,7 +32,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    // ✅ Your actual Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyAFlU1UPopFF5TUbJrbpf75pUiHWUdSi1g",
       authDomain: "road-trip-81e23.firebaseapp.com",
@@ -50,7 +53,7 @@
       createUserWithEmailAndPassword(auth, email, password)
         .then(userCredential => {
           alert("Sign‑up successful!");
-          window.location.href = "login.html"; // redirect to login
+          window.location.href = "login.html";
         })
         .catch(error => alert(error.message));
     });

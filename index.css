@@ -1,0 +1,200 @@
+.planner-shell {
+  max-width: 1180px;
+  padding: 34px 38px 28px;
+}
+
+.planner-shell .topbar {
+  margin-bottom: 36px;
+}
+
+.planner-shell .brand-mark {
+  gap: 9px;
+  letter-spacing: 0.01em;
+}
+
+.planner-shell .logo-icon {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.planner-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+  margin: 0 2px 30px;
+}
+
+.planner-hero h1 {
+  max-width: 680px;
+  margin: 8px 0 12px;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(2.35rem, 5vw, 4.35rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.planner-hero p {
+  max-width: 560px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.hero-route-mark {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 10px;
+  color: var(--accent);
+  font-size: 1.4rem;
+}
+
+.hero-route-mark i {
+  display: block;
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
+
+.planner-card {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.2);
+}
+
+.planner-form-wrap,
+.planner-shell .map-card {
+  min-width: 0;
+  padding: 28px;
+}
+
+.planner-form-wrap {
+  border-right: 1px solid var(--border);
+}
+
+.planner-shell .map-card {
+  background: rgba(5, 11, 22, 0.38);
+}
+
+.planner-shell #map {
+  min-height: 390px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+}
+
+.planner-shell .planner-submit {
+  min-height: 48px;
+  margin-top: 6px;
+}
+
+.planner-shell .destination-pill {
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.planner-shell .destination-pill:hover {
+  transform: translateY(-2px);
+}
+
+.planner-shell .recommendation-section {
+  margin-top: 28px;
+}
+
+
+/* =========================================================
+   STARTING POINT / DESTINATION ALIGNMENT FIX
+   ========================================================= */
+
+/* Remove unwanted empty space created by the status element */
+#startingPointStatus {
+  margin-top: 0 !important;
+}
+
+#startingPointStatus:empty {
+  display: none;
+}
+
+/* Keep both fields in the same row and perfectly aligned */
+#tripForm > .field-row:first-of-type {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  gap: 16px;
+}
+
+/* Prevent either field from affecting the width of the other */
+#tripForm > .field-row:first-of-type .field-group {
+  min-width: 0;
+}
+
+/* Make both inputs equal width */
+#tripForm > .field-row:first-of-type input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Keep current-location button close to the Starting Point input */
+.use-current-location-btn {
+  margin-top: 8px;
+}
+
+
+/* =========================================================
+   TABLET / MOBILE
+   ========================================================= */
+
+@media (max-width: 760px) {
+  .planner-shell {
+    padding: 24px 20px 26px;
+  }
+
+  .planner-hero {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-bottom: 24px;
+  }
+
+  .hero-route-mark {
+    display: none;
+  }
+
+  .planner-card {
+    grid-template-columns: 1fr;
+  }
+
+  .planner-form-wrap {
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Stack Starting Point and Destination on mobile */
+  #tripForm > .field-row:first-of-type {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 520px) {
+  .planner-form-wrap,
+  .planner-shell .map-card {
+    padding: 22px;
+  }
+
+  .planner-shell .planner-hero h1 {
+    font-size: clamp(2rem, 11vw, 3rem);
+  }
+
+  .planner-shell #map {
+    min-height: 300px;
+  }
+}

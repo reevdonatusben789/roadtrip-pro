@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoadTrip Pro - Admin Bootstrap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main class="page-shell admin-shell">
+    <section class="hero">
+      <h2>Create Admin Account</h2>
+      <p>Use this one-time page to create a real admin user in Firebase for the dashboard.</p>
+    </section>
+
+    <form id="adminBootstrapForm" class="admin-form">
+      <label for="adminName">Full name</label>
+      <input type="text" id="adminName" placeholder="Admin Name" required>
+
+      <label for="adminEmail">Email</label>
+      <input type="email" id="adminEmail" placeholder="admin@roadtrippro.com" required>
+
+      <label for="adminPassword">Password</label>
+      <input type="password" id="adminPassword" placeholder="Create a strong password" required>
+
+      <div id="bootstrapMessage" class="admin-error" aria-live="polite"></div>
+
+      <button type="submit" class="primary">Create admin account</button>
+      <button type="button" class="secondary" id="goToLogin">Back to admin login</button>
+    </form>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFlU1UPopFF5TUbJrbpf75pUiHWUdSi1g",
+      authDomain: "road-trip-81e23.firebaseapp.com",
+      projectId: "road-trip-81e23",
+      storageBucket: "road-trip-81e23.appspot.com",
+      messagingSenderId: "197527602150",
+      appId: "1:197527602150:web:8b5fed66fb32cf4086cc27",
+      measurementId: "G-E3NGKNHJKQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const form = document.getElementById("adminBootstrapForm");
+    const message = document.getElementById("bootstrapMessage");
+    const goToLogin = document.getElementById("goToLogin");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      message.textContent = "";
+
+      const name = document.getElementById("adminName").value.trim();
+      const email = document.getElementById("adminEmail").value.trim();
+      const password = document.getElementById("adminPassword").value;
+
+      if (!name || !email || !password) {
+        message.textContent = "Please complete all fields.";
+        return;
+      }
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+        await setDoc(doc(db, "users", userCredential.user.uid), {
+          uid: userCredential.user.uid,
+          name,
+          email,
+          role: "admin",
+          disabled: false,
+          createdAt: serverTimestamp()
+        }, { merge: true });
+
+        message.style.color = "#b7ffe3";
+        message.textContent = `Admin account created successfully. You can now log in with ${email}.`;
+        form.reset();
+      } catch (error) {
+        message.style.color = "#fca5a5";
+        message.textContent = error.message || "Unable to create admin account.";
+      }
+    });
+
+    goToLogin.addEventListener("click", () => {
+      window.location.href = "admin-login.html";
+    });
+  </script>
+</body>
+</html>

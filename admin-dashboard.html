@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RoadTrip Pro - Admin Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,63 +11,581 @@
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-  <main class="page-shell admin-shell">
-    <section class="admin-header">
-      <div>
-        <h1>Admin Dashboard</h1>
-        <p>Manage the RoadTrip Pro platform from one central admin panel.</p>
+  <div class="admin-app">
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <div class="admin-logo">R</div>
+        <div>
+          <strong>RoadTrip Pro</strong>
+          <span>Admin Console</span>
+        </div>
       </div>
-      <button class="secondary" id="adminLogout">Logout</button>
-    </section>
 
-    <section class="admin-grid">
-      <article class="admin-card">
-        <h2>Dashboard</h2>
-        <p>Quick overview of the admin workspace and recent activity.</p>
-      </article>
-      <article class="admin-card">
-        <h2>Manage Users</h2>
-        <p>View user accounts, check sign-up status, and audit user activity.</p>
-      </article>
-      <article class="admin-card">
-        <h2>Manage Trips</h2>
-        <p>Review planned trips and make adjustments for featured routes.</p>
-      </article>
-      <article class="admin-card">
-        <h2>Manage Fuel Stations</h2>
-        <p>Keep petrol and diesel station information accurate across the app.</p>
-      </article>
-      <article class="admin-card">
-        <h2>Manage EV Charging Stations</h2>
-        <p>Update charge point listings and verify EV route coverage.</p>
-      </article>
-      <article class="admin-card admin-statistics">
-        <h2>Trip Statistics</h2>
-        <p>Monitor trip volume, distance totals, and fuel savings.</p>
-      </article>
-    </section>
-  </main>
+      <nav class="admin-nav" aria-label="Admin sections">
+        <button class="nav-item active" data-target="users-section" type="button">Users</button>
+        <button class="nav-item" data-target="trips-section" type="button">Trips</button>
+        <button class="nav-item" data-target="settings-section" type="button">Settings</button>
+        <button class="nav-item" data-target="analytics-section" type="button">Analytics</button>
+      </nav>
 
-  <script>
-    const adminLogout = document.getElementById('adminLogout');
+      <button id="adminLogout" class="secondary admin-logout" type="button">Logout</button>
+    </aside>
 
-    function ensureAdminLoggedIn() {
-      const isLoggedIn = sessionStorage.getItem('roadTripProAdminLoggedIn') === 'true';
-      if (!isLoggedIn) {
-        window.location.href = 'index.html';
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div>
+          <p class="admin-eyebrow">Operations</p>
+          <h1>Admin Dashboard</h1>
+        </div>
+        <div id="adminStatusTag" class="admin-status-tag">Checking access…</div>
+      </header>
+
+      <section id="users-section" class="admin-panel active-panel">
+        <div class="panel-header">
+          <div>
+            <p class="section-kicker">User management</p>
+            <h2>Registered users</h2>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Signup date</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="trips-section" class="admin-panel">
+        <div class="panel-header">
+          <div>
+            <p class="section-kicker">Trip oversight</p>
+            <h2>All user trips</h2>
+          </div>
+        </div>
+
+        <div class="filters-grid">
+          <label>
+            <span>User</span>
+            <select id="tripUserFilter">
+              <option value="all">All users</option>
+            </select>
+          </label>
+          <label>
+            <span>Date</span>
+            <input id="tripDateFilter" type="date">
+          </label>
+          <label>
+            <span>Destination</span>
+            <input id="tripDestinationFilter" type="text" placeholder="Search destination">
+          </label>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Destination</th>
+                <th>Date</th>
+                <th>Distance</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tripsTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="settings-section" class="admin-panel">
+        <div class="panel-header">
+          <div>
+            <p class="section-kicker">System controls</p>
+            <h2>Default route settings</h2>
+          </div>
+        </div>
+
+        <form id="settingsForm" class="settings-form">
+          <label>
+            <span>Petrol price (₹/L)</span>
+            <input id="petrolPrice" type="number" min="0" step="0.1" required>
+          </label>
+          <label>
+            <span>Diesel price (₹/L)</span>
+            <input id="dieselPrice" type="number" min="0" step="0.1" required>
+          </label>
+          <label>
+            <span>Default mileage (km/L)</span>
+            <input id="defaultMileage" type="number" min="1" step="0.1" required>
+          </label>
+          <label>
+            <span>EV range preset (km)</span>
+            <input id="evRangePreset" type="number" min="1" step="1" required>
+          </label>
+
+          <button type="submit" class="primary">Save settings</button>
+        </form>
+      </section>
+
+      <section id="analytics-section" class="admin-panel">
+        <div class="panel-header">
+          <div>
+            <p class="section-kicker">Analytics</p>
+            <h2>Trip insights</h2>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span>Total trips</span>
+            <strong id="totalTripsStat">0</strong>
+          </div>
+          <div class="stat-card">
+            <span>Average distance</span>
+            <strong id="avgDistanceStat">0 km</strong>
+          </div>
+          <div class="stat-card">
+            <span>Most popular destination</span>
+            <strong id="popularDestinationStat">—</strong>
+          </div>
+        </div>
+
+        <div class="analytics-grid">
+          <div class="mini-panel">
+            <h3>Top destinations</h3>
+            <ul id="destinationList"></ul>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      sendPasswordResetEmail,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      getDoc,
+      getDocs,
+      deleteDoc,
+      updateDoc,
+      setDoc,
+      query,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAFlU1UPopFF5TUbJrbpf75pUiHWUdSi1g",
+      authDomain: "road-trip-81e23.firebaseapp.com",
+      projectId: "road-trip-81e23",
+      storageBucket: "road-trip-81e23.appspot.com",
+      messagingSenderId: "197527602150",
+      appId: "1:197527602150:web:8b5fed66fb32cf4086cc27",
+      measurementId: "G-E3NGKNHJKQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const state = {
+      users: [],
+      trips: [],
+      settingDoc: {
+        petrolPrice: 103.5,
+        dieselPrice: 90.8,
+        defaultMileage: 18,
+        evRangePreset: 380
+      }
+    };
+
+    const refs = {
+      usersTableBody: document.getElementById("usersTableBody"),
+      tripsTableBody: document.getElementById("tripsTableBody"),
+      tripUserFilter: document.getElementById("tripUserFilter"),
+      tripDateFilter: document.getElementById("tripDateFilter"),
+      tripDestinationFilter: document.getElementById("tripDestinationFilter"),
+      adminStatusTag: document.getElementById("adminStatusTag"),
+      toast: document.getElementById("toast"),
+      settingsForm: document.getElementById("settingsForm"),
+      petrolPrice: document.getElementById("petrolPrice"),
+      dieselPrice: document.getElementById("dieselPrice"),
+      defaultMileage: document.getElementById("defaultMileage"),
+      evRangePreset: document.getElementById("evRangePreset"),
+      totalTripsStat: document.getElementById("totalTripsStat"),
+      avgDistanceStat: document.getElementById("avgDistanceStat"),
+      popularDestinationStat: document.getElementById("popularDestinationStat"),
+      destinationList: document.getElementById("destinationList")
+    };
+
+    function showToast(message) {
+      refs.toast.textContent = message;
+      refs.toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => refs.toast.classList.remove("show"), 2200);
+    }
+
+    document.querySelectorAll(".nav-item").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".nav-item").forEach((item) => item.classList.toggle("active", item === button));
+        document.querySelectorAll(".admin-panel").forEach((panel) => panel.classList.toggle("active-panel", panel.id === button.dataset.target));
+      });
+    });
+
+    document.getElementById("adminLogout").addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        sessionStorage.removeItem("roadTripProAdminLoggedIn");
+        window.location.href = "index.html";
+      } catch (error) {
+        console.error("Logout error", error);
+        showToast("Unable to log out right now.");
+      }
+    });
+
+    async function getUserRole(user) {
+      const token = await user.getIdTokenResult().catch(() => ({ claims: {} }));
+      if (token.claims && token.claims.role === "admin") {
+        return "admin";
+      }
+
+      if (sessionStorage.getItem("roadTripProAdminLoggedIn") === "true") {
+        return "admin";
+      }
+
+      try {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          return userDoc.data().role || "user";
+        }
+      } catch (error) {
+        console.warn("Admin Firestore check failed, using auth session fallback:", error);
+      }
+
+      return "user";
+    }
+
+    async function ensureAdminAccess() {
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          sessionStorage.removeItem("roadTripProAdminLoggedIn");
+          window.location.href = "admin-login.html";
+          return;
+        }
+
+        try {
+          const role = await getUserRole(user);
+          if (role !== "admin") {
+            sessionStorage.removeItem("roadTripProAdminLoggedIn");
+            window.location.href = "index.html";
+            return;
+          }
+
+          sessionStorage.setItem("roadTripProAdminLoggedIn", "true");
+          refs.adminStatusTag.textContent = "Admin access confirmed";
+          await loadDashboard();
+        } catch (error) {
+          console.error("Admin access check failed:", error);
+          sessionStorage.removeItem("roadTripProAdminLoggedIn");
+          window.location.href = "admin-login.html";
+        }
+      });
+    }
+
+    async function loadUsers() {
+      const usersSnap = await getDocs(collection(db, "users"));
+      state.users = usersSnap.docs.map((docSnap) => {
+        const data = docSnap.data();
+        return {
+          id: docSnap.id,
+          name: data.name || "Unknown user",
+          email: data.email || "—",
+          role: data.role || "user",
+          disabled: Boolean(data.disabled),
+          createdAt: data.createdAt && typeof data.createdAt.toDate === "function" ? data.createdAt.toDate() : new Date()
+        };
+      });
+
+      renderUsers();
+      renderTripUserFilter();
+    }
+
+    function renderUsers() {
+      if (!state.users.length) {
+        refs.usersTableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-state">No user records found.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      refs.usersTableBody.innerHTML = state.users
+        .map((user) => `
+          <tr>
+            <td>${user.name}</td>
+            <td>${user.email}</td>
+            <td>${user.createdAt.toLocaleDateString()}</td>
+            <td><span class="pill ${user.role === "admin" ? "admin-pill" : "user-pill"}">${user.role}</span></td>
+            <td><span class="pill ${user.disabled ? "disabled-pill" : "active-pill"}">${user.disabled ? "Disabled" : "Active"}</span></td>
+            <td class="action-cell">
+              <button class="secondary tiny" data-action="reset-password" data-user-email="${user.email}" type="button">Reset password</button>
+              <button class="secondary tiny" data-action="toggle-status" data-user-id="${user.id}" data-user-disabled="${user.disabled}" type="button">${user.disabled ? "Enable" : "Disable"}</button>
+              <button class="secondary tiny" data-action="toggle-role" data-user-id="${user.id}" data-user-role="${user.role}" type="button">${user.role === "admin" ? "Demote" : "Promote"}</button>
+            </td>
+          </tr>
+        `)
+        .join("");
+
+      refs.usersTableBody.querySelectorAll("button[data-action]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const action = button.dataset.action;
+          if (action === "reset-password") {
+            const email = button.dataset.userEmail;
+            await handlePasswordReset(email);
+            return;
+          }
+
+          const userId = button.dataset.userId;
+          const targetUser = state.users.find((user) => user.id === userId);
+          if (!targetUser) return;
+
+          if (action === "toggle-status") {
+            await updateUserStatus(userId, !targetUser.disabled);
+            return;
+          }
+
+          if (action === "toggle-role") {
+            const nextRole = targetUser.role === "admin" ? "user" : "admin";
+            await updateUserRole(userId, nextRole);
+          }
+        });
+      });
+    }
+
+    async function handlePasswordReset(email) {
+      if (!email || email === "—") {
+        showToast("No email available for this user.");
+        return;
+      }
+
+      try {
+        await sendPasswordResetEmail(auth, email);
+        showToast("Reset email sent.");
+      } catch (error) {
+        console.error("Password reset failed:", error);
+        showToast("Password reset failed.");
       }
     }
 
-    adminLogout.addEventListener('click', () => {
+    async function updateUserStatus(userId, disabled) {
       try {
-        sessionStorage.removeItem('roadTripProAdminLoggedIn');
+        await updateDoc(doc(db, "users", userId), { disabled });
+        showToast(disabled ? "Account disabled." : "Account enabled.");
+        await loadUsers();
       } catch (error) {
-        console.warn('Unable to clear admin session state', error);
+        console.error("Unable to update user status:", error);
+        showToast("Status update failed.");
       }
-      window.location.href = 'index.html';
+    }
+
+    async function updateUserRole(userId, nextRole) {
+      try {
+        await updateDoc(doc(db, "users", userId), { role: nextRole });
+        showToast(`User role updated to ${nextRole}.`);
+        await loadUsers();
+      } catch (error) {
+        console.error("Unable to update user role:", error);
+        showToast("Role update failed.");
+      }
+    }
+
+    async function loadTrips() {
+      const tripsSnap = await getDocs(collection(db, "trips"));
+      state.trips = tripsSnap.docs.map((document) => {
+        const data = document.data();
+        return {
+          id: document.id,
+          uid: data.uid || "unknown",
+          userLabel: data.userEmail || data.userName || data.uid || "Unknown user",
+          destination: data.end || data.destination || "Unknown destination",
+          date: data.date || data.createdAt || data.tripDate || "",
+          distance: Number(data.distance || 0),
+          rawDistance: data.distance || "0"
+        };
+      });
+
+      renderTrips();
+      renderAnalytics();
+    }
+
+    function renderTripUserFilter() {
+      const uniqueUsers = [...new Set(state.users.map((user) => user.email || user.name))];
+      const currentValue = refs.tripUserFilter.value || "all";
+
+      refs.tripUserFilter.innerHTML = '<option value="all">All users</option>' + uniqueUsers
+        .map((user) => `<option value="${user}">${user}</option>`)
+        .join("");
+
+      refs.tripUserFilter.value = uniqueUsers.includes(currentValue) ? currentValue : "all";
+    }
+
+    function renderTrips() {
+      const userFilter = refs.tripUserFilter.value;
+      const dateFilter = refs.tripDateFilter.value;
+      const destinationFilter = refs.tripDestinationFilter.value.trim().toLowerCase();
+
+      const filteredTrips = state.trips.filter((trip) => {
+        const userMatches = userFilter === "all" || trip.userLabel === userFilter;
+        const dateMatches = !dateFilter || (trip.date && String(trip.date).includes(dateFilter));
+        const destinationMatches = !destinationFilter || trip.destination.toLowerCase().includes(destinationFilter);
+        return userMatches && dateMatches && destinationMatches;
+      });
+
+      if (!filteredTrips.length) {
+        refs.tripsTableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty-state">No trips match the selected filters.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      refs.tripsTableBody.innerHTML = filteredTrips
+        .map((trip) => `
+          <tr>
+            <td>${trip.userLabel}</td>
+            <td>${trip.destination}</td>
+            <td>${formatTripDate(trip.date)}</td>
+            <td>${trip.rawDistance || `${trip.distance.toFixed(1)} km`}</td>
+            <td class="action-cell">
+              <button class="secondary tiny" data-action="delete-trip" data-trip-id="${trip.id}" type="button">Delete</button>
+            </td>
+          </tr>
+        `)
+        .join("");
+
+      refs.tripsTableBody.querySelectorAll("button[data-action='delete-trip']").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const tripId = button.dataset.tripId;
+          if (!tripId) return;
+
+          const confirmed = window.confirm("Delete this trip?");
+          if (!confirmed) return;
+
+          try {
+            await deleteDoc(doc(db, "trips", tripId));
+            showToast("Trip deleted.");
+            await loadTrips();
+          } catch (error) {
+            console.error("Unable to delete trip:", error);
+            showToast("Trip deletion failed.");
+          }
+        });
+      });
+    }
+
+    function formatTripDate(value) {
+      if (!value) return "—";
+
+      if (typeof value === "string") {
+        const datePart = value.split(" ")[0];
+        if (datePart && datePart.includes("-")) return new Date(datePart).toLocaleDateString();
+        return value;
+      }
+
+      if (typeof value.toDate === "function") {
+        return value.toDate().toLocaleDateString();
+      }
+
+      return new Date(value).toLocaleDateString();
+    }
+
+    refs.tripUserFilter.addEventListener("change", renderTrips);
+    refs.tripDateFilter.addEventListener("input", renderTrips);
+    refs.tripDestinationFilter.addEventListener("input", renderTrips);
+
+    async function loadSettings() {
+      const settingsSnap = await getDoc(doc(db, "settings", "app"));
+
+      if (settingsSnap.exists()) {
+        state.settingDoc = { ...state.settingDoc, ...settingsSnap.data() };
+      } else {
+        await setDoc(doc(db, "settings", "app"), state.settingDoc, { merge: true });
+      }
+
+      refs.petrolPrice.value = state.settingDoc.petrolPrice;
+      refs.dieselPrice.value = state.settingDoc.dieselPrice;
+      refs.defaultMileage.value = state.settingDoc.defaultMileage;
+      refs.evRangePreset.value = state.settingDoc.evRangePreset;
+    }
+
+    refs.settingsForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const updates = {
+        petrolPrice: Number(refs.petrolPrice.value),
+        dieselPrice: Number(refs.dieselPrice.value),
+        defaultMileage: Number(refs.defaultMileage.value),
+        evRangePreset: Number(refs.evRangePreset.value),
+        updatedAt: serverTimestamp()
+      };
+
+      try {
+        await setDoc(doc(db, "settings", "app"), updates, { merge: true });
+        state.settingDoc = { ...state.settingDoc, ...updates };
+        showToast("System settings saved.");
+      } catch (error) {
+        console.error("Settings save failed:", error);
+        showToast("Settings could not be saved.");
+      }
     });
 
-    ensureAdminLoggedIn();
+    function renderAnalytics() {
+      const totalTrips = state.trips.length;
+      const averageDistance = totalTrips ? (state.trips.reduce((sum, trip) => sum + Number(trip.distance || 0), 0) / totalTrips) : 0;
+
+      refs.totalTripsStat.textContent = String(totalTrips);
+      refs.avgDistanceStat.textContent = `${averageDistance.toFixed(1)} km`;
+
+      const destinationCounts = {};
+      state.trips.forEach((trip) => {
+        const destination = trip.destination || "Unknown";
+        destinationCounts[destination] = (destinationCounts[destination] || 0) + 1;
+      });
+
+      const popularDestination = Object.entries(destinationCounts).sort((a, b) => b[1] - a[1])[0];
+      refs.popularDestinationStat.textContent = popularDestination ? popularDestination[0] : "—";
+
+      refs.destinationList.innerHTML = Object.entries(destinationCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([destination, count]) => `<li><span>${destination}</span><strong>${count}</strong></li>`)
+        .join("");
+    }
+
+    async function loadDashboard() {
+      await Promise.all([loadUsers(), loadTrips(), loadSettings()]);
+    }
+
+    ensureAdminAccess();
   </script>
 </body>
 </html>
